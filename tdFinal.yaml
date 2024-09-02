@@ -1,0 +1,10 @@
+openapi: 3.1.0
+info:
+  title: Football OpenAPI
+  description: Gestion des matchs d'une compétition
+  version: 1.0.0
+servers:
+  - url: 'https://localhost.std23011.com'
+paths:
+  /Competition:
+    get:
