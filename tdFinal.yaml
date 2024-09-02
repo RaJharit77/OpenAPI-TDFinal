@@ -6,5 +6,232 @@ info:
 servers:
   - url: 'https://localhost.std23011.com'
 paths:
-  /Competition:
+  /competitions:
     get:
+      summary: Get a list of competitions
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: true
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompetitionListResponse'
+    post:
+      summary: Create a new competition
+      description: Add a new football competition.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCompetitionRequest'
+      responses:
+        '201':
+          description: The competition has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Competition'
+
+  /teams:
+    get:
+      summary: Get a list of teams
+      description: Retrieve a list of football teams, filtered by team name if provided.
+      parameters:
+        - name: teamName
+          in: query
+          description: Filter teams by name
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: true
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamListResponse'
+    post:
+      summary: Create a new team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTeamRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+
+  /teams/{teamId}/competitions:
+    post:
+      summary: Associate a team with competitions
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssociateCompetitionsRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+
+components:
+  schemas:
+    Competition:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        location:
+          type: string
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slogan:
+          type: string
+        competitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Competition'
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+
+    Player:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        number:
+          type: integer
+        strongFoot:
+          type: string
+          enum: [ Left, Right ]
+          description: The strong foot of the player.
+
+    CreateCompetitionRequest:
+      type: object
+      required:
+        - name
+        - location
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+
+    CreateTeamRequest:
+      type: object
+      required:
+        - name
+        - slogan
+      properties:
+        name:
+          type: string
+        slogan:
+          type: string
+
+    AssociateCompetitionsRequest:
+      type: object
+      required:
+        - competitionIds
+      properties:
+        competitionIds:
+          type: array
+
+    AssociatePlayersRequest:
+      type: object
+      required:
+        - playerIds
+      properties:
+        playerIds:
+
+
+    CompetitionListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Competition'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalItems:
+          type: integer
+
+    TeamListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalItems:
+          type: integer
+
+    PlayerListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalItems:
+          type: integer
+
